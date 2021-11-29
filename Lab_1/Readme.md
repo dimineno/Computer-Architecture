@@ -5,7 +5,7 @@
 #### Ερώτημα 1
 
 Στο 1ο ερώτημα εκτέλεσα ένα απλό πρόγραμμα το οποίο εμφανίζει στην έξοδο του συστήματος (stdout) την έκφραση **Hello World!**.
-Η εκτέλεση του προγράμματος γίνετα με την εντολή
+Η εκτέλεση του προγράμματος γίνεται με την εντολή
 
 `$ build/ARM/gem5.opt -d results/hello_result configs/example/arm/starter_se.py --cpu="minor" "tests/test-progs/hello/bin/arm/linux/hello"` 
 
