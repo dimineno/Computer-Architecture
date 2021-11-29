@@ -7,7 +7,7 @@
 Στο 1ο ερώτημα εκτέλεσα ένα απλό πρόγραμμα το οποίο εμφανίζει στην έξοδο του συστήματος (stdout) την έκφραση **Hello World!**.
 Η εκτέλεση του προγράμματος γίνεται με την εντολή
 
-`$ build/ARM/gem5.opt -d results/hello_result configs/example/arm/starter_se.py --cpu="minor" "tests/test-progs/hello/bin/arm/linux/hello"` 
+`$ build/ARM/gem5.opt -d results/Lab_1/hello_result configs/example/arm/starter_se.py --cpu="minor" "tests/test-progs/hello/bin/arm/linux/hello"` 
 
 , δεδομένου ότι βρισκόμαστε στο _gem5 directory_. Η εντολή αυτή λεέι ότι θα κάνουμε build με τον simulator _gem5.opt_ με **guest architecture ARM**, στην συνέχεια χρησιμοποιόυμε το flag **-d** για να ανακατευθύνουμε το **output** του προγράμματος στο directory results/hello_result. Στην συνέχεια, δίνουμε το script το οποίο θέλουμε να τρέξουμε (_starter_se.py_) . Τέλος, δίνουμε δύο **cmdargs** στο script, το ένα είναι ο τύπος cpu που θέλουμε να χρησιμοποιήσουμε (minor CPU) και το άλλο είναι το εκτελέσιμο binary αρχείο που θέλουμε να τρέξει το script (hello).
 
@@ -191,7 +191,7 @@ arm-linux-gnueabihf-gcc --static ./script/program.c -o ./script/programCompiled
 Αρχικά τρέχω το πρόγραμμα χρησιμοποιώντας ως CPU την MinorCPU με την παρακάτω εντολή :
 
 ```ruby
-./build/ARM/gem5.opt -d results/CPUMinor configs/example/se.py --cpu-type=MinorCPU --caches -c ./script/programCompiled
+./build/ARM/gem5.opt -d rresults/Lab_1/CPUMinor configs/example/se.py --cpu-type=MinorCPU --caches -c ./script/programCompiled
  
 ```
 Κάποια βασικά αποτελέσματα του simulation φαίνονται παρακάτω:
@@ -223,7 +223,7 @@ system.cpu.numCycles                            82354                       # nu
 
 
 ```ruby
-./build/ARM/gem5.opt -d results/TimingSimpleCPU configs/example/se.py --cpu-type=TimingSimpleCPU --caches -c ./script/programCompiled
+./build/ARM/gem5.opt -d results/Lab_1/TimingSimpleCPU configs/example/se.py --cpu-type=TimingSimpleCPU --caches -c ./script/programCompiled
 
 ```
 Κάποια βασικά αποτελέσματα του simulation φαίνονται παρακάτω
@@ -255,7 +255,7 @@ system.cpu.numCycles                           101118                       # nu
 Πρώτα κάνουμε προσομείωση με συχνότητα 500MHz για τους δυο μοντέλα CPU
 MinorCPU:
 ```ruby
-./build/ARM/gem5.opt -d results/CPUMinor500MHz configs/example/se.py --cpu-type=MinorCPU --cpu-clock="500MHz" --caches -c ./script/programCompiled
+./build/ARM/gem5.opt -d results/Lab_1/CPUMinor500MHz configs/example/se.py --cpu-type=MinorCPU --cpu-clock="500MHz" --caches -c ./script/programCompiled
 ```
 Κάποια βασικά αποτελέσματα του simulation φαίνονται παρακάτω
 
@@ -283,7 +283,7 @@ system.cpu.numCycles                            39243                       # nu
 Για το TimingSimple μοντέλο τρέχω:
 
 ```ruby
-./build/ARM/gem5.opt -d results/TimingSimpleCPU_500MHz configs/example/se.py --cpu-type=TimingSimpleCPU --cpu-clock="500MHz" --caches -c ./script/programCompiled
+./build/ARM/gem5.opt -d results/Lab_1/TimingSimpleCPU_500MHz configs/example/se.py --cpu-type=TimingSimpleCPU --cpu-clock="500MHz" --caches -c ./script/programCompiled
 ```
 
 Κάποια βασικά αποτελέσματα του simulation φαίνονται παρακάτω:
@@ -318,7 +318,7 @@ system.cpu.num_busy_cycles               62478.999500                       # Nu
 
 MinorCPU:
 ```ruby
-./build/ARM/gem5.opt -d results/MinorCPU_mem_DDR3_2133_8x8 configs/example/se.py --cpu-type=MinorCPU --mem-type=DDR3_2133_8x8 --caches -c ./script/programCompiled
+./build/ARM/gem5.opt -d results/Lab_1/MinorCPU_mem_DDR3_2133_8x8 configs/example/se.py --cpu-type=MinorCPU --mem-type=DDR3_2133_8x8 --caches -c ./script/programCompiled
 ```
 
 ```ruby
@@ -345,7 +345,7 @@ system.cpu.numCycles                            79056                       # nu
 TimingSimpleCPU
 
 ```ruby
-./build/ARM/gem5.opt -d results/TimingSimpleCPU_mem_DDR3_2133_8x8 configs/example/se.py --cpu-type=TimingSimpleCPU  --mem-type=DDR3_2133_8x8 --caches -c ./script/programCompiled
+./build/ARM/gem5.opt -d results/Lab_1/TimingSimpleCPU_mem_DDR3_2133_8x8 configs/example/se.py --cpu-type=TimingSimpleCPU  --mem-type=DDR3_2133_8x8 --caches -c ./script/programCompiled
 ```
 
 
