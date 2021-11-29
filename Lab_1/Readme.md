@@ -4,7 +4,7 @@
 
 #### Ερώτημα 1
 
-Στο 1ο ερώτημα εκτελέσαμε ένα απλό πρόγραμμα το οποίο εμφανίζει στην έξοδο του συστήματος (stdout) την έκφραση **Hello World!**.
+Στο 1ο ερώτημα εκτέλεσα ένα απλό πρόγραμμα το οποίο εμφανίζει στην έξοδο του συστήματος (stdout) την έκφραση **Hello World!**.
 Η εκτέλεση του προγράμματος γίνετα με την εντολή
 
 `$ build/ARM/gem5.opt -d results/hello_result configs/example/arm/starter_se.py --cpu="minor" "tests/test-progs/hello/bin/arm/linux/hello"` 
@@ -157,3 +157,215 @@ system.cpu_cluster.l2.overall_misses::total                                    4
 sim_insts                                        5028                       # Number of instructions simulated
 ```
 Άρα κάντοντας την πράξη το CPI= ((332+179)*6 + 479*50)/5028=5.37
+
+#### Ερώτημα 4
+Ο emulator gem5 χρησιμοποιεί διάφορα μοντέλα CPU, κάποια in-οrder και κάποια out-of-order. Τα in-order μοντέλα που χρησιμοποιεί είναι τα **Simple CPU** και **Minor CPU** models.
+
+Το μοντέλο Simple CPU έχει ανανεωθεί πρόσφατα και έχει χωριστεί σε 3 κλάσεις, **BaseSimpleCPU**, **AtomicSimpleCPU** και **TimingSimpleCPU**. 
+Το BaseSimpleCPU μοντέλω εξυπηρετεί διάφορους σκοπούς όπως την εκτέλεση συναρτήσεων οι οποίες κάνουν έλεγχω για τυχόν interrupts, κάνει τα fetch requests και αναλαμβάνει και κάποιες post-excecute διεργασίες. Η κλάση BaseSimpleCPU δεν μπορεί να χρησιμοποιηθεί μόνη της καθώς χρειάζεται να κληθούν και μια από τις κλάσεις AtomicSimpleCPU ή TimingSimpleCPU οι οποίες κληρονομούν την κλάση BaseSimpleCPU. Όπως λέει και ο τίτλος το μοντέλο **AtomicSimpleCPU** χρησιμοποιεί _Atomic Memory Access_ όπου είναι μια αρκετά γρήγορη και απλουστευμένη μέθοδος memory accessing, η οποία χρησιμοποιείται για fast forwarding και warming up των caches. Τo μοντέλο Atomic Simple CPU εκτελεί όλα τα operations για ένα instruction μέσα σε 1 κυκλο ρολογιού. Η κλάση AtomicSimpleCPU λοιπόν δημιουργεί ports μεταξύ μνήμης και επεξεργαστή. Η κλάση TimingSimpleCPU έχει ακριβώς την ίδια λειτουργία με την κλάση AtomicSimpleCPU (δηλαδή την διασύνδεση CPU-Cache) με μόνη διαφορά ότι χρησιμοποιεί _timing memory access_. Δηλαδή, μια μέθοδο προσπέλασης μνήμης η οποία είναι αρκετά λεπτομερής και κάνει stall τα cache accesses και περιμένει ACK (Acknowledgment) πρωτού συνεχίσει.
+
+Το μοντέλο **MinorCPU** αποτελεί ένα ευέλικτο μοντέλο in-order CPU που αναπτύχθηκε αρχικά για να υποστηρίζει το Arm ISA, ενώ υποστηρίζει και άλλα ISAs. Το MinorCPU έχει fixed four-stage in-order execution pipeline, ενώ διαθέτει ρυθμιζόμενες δομές δεδομένων και συμπεριφορά εκτέλεσης. Επομένως μπορεί να ρυθμιστεί σε επίπεδο μικρο-αρχιτεκτονικής για να μοντελοποιήσει συγκεκριμένο επεξεργαστή. Το four-stage pipeline περιλαμβάνει fetching lines, decomposition into macro-ops, decomposition of macro-ops into micro-ops και execute.
+
+#### A. 
+Για το ερώτημα αυτό αναπτύχθηκε ένα απλό πρόγραμμα σε C που απλά τυπώνει τους αριθμούς από το 0 μέχρι και το δέκα. 
+
+
+```ruby
+#include<stdio.h>
+
+int main()
+{int i;
+for (i=0; i<=10; i++){
+printf("%d \n", i);
+}
+return 0;
+}
+```
+
+Για να κάνω compile το αρχείο .c σε εκτελέσιμο που προσδιορίζεται για ARM ISA έπρεπε να τρέξω την παρακάτω εντολή,
+
+```ruby
+arm-linux-gnueabihf-gcc --static ./script/program.c -o ./script/programCompiled
+```
+
+Αρχικά τρέχω το πρόγραμμα χρησιμοποιώντας ως CPU την MinorCPU με την παρακάτω εντολή :
+
+```ruby
+./build/ARM/gem5.opt -d results/CPUMinor configs/example/se.py --cpu-type=MinorCPU --caches -c ./script/programCompiled
+ 
+```
+Κάποια βασικά αποτελέσματα του simulation φαίνονται παρακάτω:
+
+
+
+```ruby
+final_tick                                   41177000                       # Number of ticks from beginning of simulation (restored from checkpoints and never reset)
+host_inst_rate                                  83500                       # Simulator instruction rate (inst/s)
+host_mem_usage                                 667384                       # Number of bytes of host memory used
+host_op_rate                                    97732                       # Simulator op (including micro ops) rate (op/s)
+host_seconds                                     0.19                       # Real time elapsed on the host
+host_tick_rate                              214139312                       # Simulator tick rate (ticks/s)
+sim_freq                                 1000000000000                       # Frequency of simulated ticks
+sim_insts                                       16037                       # Number of instructions simulated
+sim_ops                                         18789                       # Number of ops (including micro ops) simulated
+sim_seconds                                  0.000041                       # Number of seconds simulated
+sim_ticks                                    41177000                       # Number of ticks simulated
+system.cpu.committedInsts                       16037                       # Number of instructions committed
+system.cpu.committedOps                         18789                       # Number of ops (including micro ops) committed
+system.cpu.cpi                               5.135250                       # CPI: cycles per instruction
+system.cpu.discardedOps                          2174                       # Number of ops (including micro ops) which were discarded before commit
+system.cpu.idleCycles                           54668                       # Total number of cycles that the object has spent stopped
+system.cpu.ipc                               0.194732                       # IPC: instructions per cycle
+system.cpu.numCycles                            82354                       # number of cpu cycles simulated
+```
+Στη συνέχεια τρέχω την ίδια εντολή αλλά αυτή την φορά για **TimingSimpleCPU** :
+
+
+
+```ruby
+./build/ARM/gem5.opt -d results/TimingSimpleCPU configs/example/se.py --cpu-type=TimingSimpleCPU --caches -c ./script/programCompiled
+
+```
+Κάποια βασικά αποτελέσματα του simulation φαίνονται παρακάτω
+
+```ruby
+final_tick                                   50559000                       # Number of ticks from beginning of simulation (restored from checkpoints and never reset)
+host_inst_rate                                 312753                       # Simulator instruction rate (inst/s)
+host_mem_usage                                 665596                       # Number of bytes of host memory used
+host_op_rate                                   363823                       # Simulator op (including micro ops) rate (op/s)
+host_seconds                                     0.05                       # Real time elapsed on the host
+host_tick_rate                              989408811                       # Simulator tick rate (ticks/s)
+sim_freq                                 1000000000000                       # Frequency of simulated ticks
+sim_insts                                       15938                       # Number of instructions simulated
+sim_ops                                         18583                       # Number of ops (including micro ops) simulated
+sim_seconds                                  0.000051                       # Number of seconds simulated
+sim_ticks                                    50559000                       # Number of ticks simulated
+system.cpu.Branches                              3258                       # Number of branches fetched
+system.cpu.committedInsts                       15938                       # Number of instructions committed
+system.cpu.committedOps                         18583                       # Number of ops (including micro ops) committed
+system.cpu.idle_fraction                     0.000000                       # Percentage of idle cycles
+system.cpu.not_idle_fraction                 1.000000                       # Percentage of non-idle cycles
+system.cpu.numCycles                           101118                       # number of cpu cycles simulated
+```
+
+Άν συγκρίνουμε τα αποτελέσματα των δυο μοντέλων ο συνολικός αριθμός των κύκλων ρολογιού του κάθε simulation, δεδομένου ότι και τα δυο μοντέλα έτρεξαν στην ίδια συχνότητα, βλέπουμε ότι το μοντέλο TiminigSimpleCPU εκτελείτε σε 101118 κύκλους μηχανής, ενώ το μοντέλο MinorCPU εκτελείτε σε 82354,, δηλαδή εκτελείτε πιο γρήγορα. Το παραπάνω αποτέλεσμα είναι λογικό καθώς το μοντέλο MinorCPU χρησιμοποιεί τεχνικές pipelinining. Η υλοποίηση όμως μιας τέτοιας μοντελοποίησης, όπως αυτή του pipelining είναι απαιτητική για το σύστημα μας και αυτό επαληθεύεται απο την σύγκριση των host_seconts, καθώς βλέπουμε ότι το μοντέλο MinorCPU χρειάστηκε 0.19 sec για να τρέξει στο host machine, ενω το μοντέλο TimingSimpleCPU χρειάστηκε 0.05sec.
+
+
+### B.
+Πρώτα κάνουμε προσομείωση με συχνότητα 500MHz για τους δυο μοντέλα CPU
+MinorCPU:
+```ruby
+./build/ARM/gem5.opt -d results/CPUMinor500MHz configs/example/se.py --cpu-type=MinorCPU --cpu-clock="500MHz" --caches -c ./script/programCompiled
+```
+Κάποια βασικά αποτελέσματα του simulation φαίνονται παρακάτω
+
+```ruby
+inal_tick                                   78486000                       # Number of ticks from beginning of simulation (restored from checkpoints and never reset)
+host_inst_rate                                 120469                       # Simulator instruction rate (inst/s)
+host_mem_usage                                 667384                       # Number of bytes of host memory used
+host_op_rate                                   141009                       # Simulator op (including micro ops) rate (op/s)
+host_seconds                                     0.13                       # Real time elapsed on the host
+host_tick_rate                              588925102                       # Simulator tick rate (ticks/s)
+sim_freq                                 1000000000000                       # Frequency of simulated ticks
+sim_insts                                       16037                       # Number of instructions simulated
+sim_ops                                         18789                       # Number of ops (including micro ops) simulated
+sim_seconds                                  0.000078                       # Number of seconds simulated
+sim_ticks                                    78486000                       # Number of ticks simulated
+system.cpu.committedInsts                       16037                       # Number of instructions committed
+system.cpu.committedOps                         18789                       # Number of ops (including micro ops) committed
+system.cpu.cpi                               2.447029                       # CPI: cycles per instruction
+system.cpu.discardedOps                          2159                       # Number of ops (including micro ops) which were discarded before commit
+system.cpu.idleCycles                           11982                       # Total number of cycles that the object has spent stopped
+system.cpu.ipc                               0.408659                       # IPC: instructions per cycle
+system.cpu.numCycles                            39243                       # number of cpu cycles simulated
+```
+
+Για το TimingSimple μοντέλο τρέχω:
+
+```ruby
+./build/ARM/gem5.opt -d results/TimingSimpleCPU_500MHz configs/example/se.py --cpu-type=TimingSimpleCPU --cpu-clock="500MHz" --caches -c ./script/programCompiled
+```
+
+Κάποια βασικά αποτελέσματα του simulation φαίνονται παρακάτω:
+```ruby
+final_tick                                  124958000                       # Number of ticks from beginning of simulation (restored from checkpoints and never reset)
+host_inst_rate                                 306055                       # Simulator instruction rate (inst/s)
+host_mem_usage                                 665340                       # Number of bytes of host memory used
+host_op_rate                                   355800                       # Simulator op (including micro ops) rate (op/s)
+host_seconds                                     0.05                       # Real time elapsed on the host
+host_tick_rate                             2390850961                       # Simulator tick rate (ticks/s)
+sim_freq                                 1000000000000                       # Frequency of simulated ticks
+sim_insts                                       15938                       # Number of instructions simulated
+sim_ops                                         18583                       # Number of ops (including micro ops) simulated
+sim_seconds                                  0.000125                       # Number of seconds simulated
+sim_ticks                                   124958000                       # Number of ticks simulated
+system.cpu.Branches                              3258                       # Number of branches fetched
+system.cpu.committedInsts                       15938                       # Number of instructions committed
+system.cpu.committedOps                         18583                       # Number of ops (including micro ops) committed
+system.cpu.idle_fraction                     0.000000                       # Percentage of idle cycles
+system.cpu.not_idle_fraction                 1.000000                       # Percentage of non-idle cycles
+system.cpu.numCycles                            62479                       # number of cpu cycles simulated
+system.cpu.numWorkItemsCompleted                    0                       # number of work items this cpu completed
+system.cpu.numWorkItemsStarted                      0                       # number of work items this cpu started
+system.cpu.num_busy_cycles               62478.999500                       # Number of busy cycles
+```
+
+Αυτό που παρατηρώ είναι ότι, όπως είναι λογικό άλλωστε με την μείωση της συχνότητας της CPU, αυξήθηκε ο συνολικός χρόνος εκτέλεσης του κάθε μοντέλου ξεχωριστά. Αυτό, όμως που αξίζει να σημειωθεί είναι ότι η μείωση της συχνότητας της CPU είχε πολύ μεγαλύτερο impact στο μοντέλο TimingSimpleCPU, εν αντιθέση με το μοντέλο MinorCPU. 
+
+
+
+Τέλος θα αλλάξω την τεχνολογία της μνήμης μας από DDR3_1600_8x8 (που είναι η default τιμή) σε DDR3_2133_8x8 και θα εξετάσω τα αποτελέσματα. Πάλι, παραθέτονται οι εντολές που έτρεξαν στο τερματικό και τα αντίστοιχα στατιστικά του εκάστοτε simulation για τα διαφορετικά μοντέλα CPU.
+MinorCPU:
+```ruby
+./build/ARM/gem5.opt -d results/MinorCPU_mem_DDR3_2133_8x8 configs/example/se.py --cpu-type=MinorCPU --mem-type=DDR3_2133_8x8 --caches -c ./script/programCompiled
+```
+
+```ruby
+final_tick                                   39528000                       # Number of ticks from beginning of simulation (restored from checkpoints and never reset)
+host_inst_rate                                 125621                       # Simulator instruction rate (inst/s)
+host_mem_usage                                 667388                       # Number of bytes of host memory used
+host_op_rate                                   146979                       # Simulator op (including micro ops) rate (op/s)
+host_seconds                                     0.13                       # Real time elapsed on the host
+host_tick_rate                              309151463                       # Simulator tick rate (ticks/s)
+sim_freq                                 1000000000000                       # Frequency of simulated ticks
+sim_insts                                       16037                       # Number of instructions simulated
+sim_ops                                         18789                       # Number of ops (including micro ops) simulated
+sim_seconds                                  0.000040                       # Number of seconds simulated
+sim_ticks                                    39528000                       # Number of ticks simulated
+system.cpu.committedInsts                       16037                       # Number of instructions committed
+system.cpu.committedOps                         18789                       # Number of ops (including micro ops) committed
+system.cpu.cpi                               4.929600                       # CPI: cycles per instruction
+system.cpu.discardedOps                          2173                       # Number of ops (including micro ops) which were discarded before commit
+system.cpu.idleCycles                           51362                       # Total number of cycles that the object has spent stopped
+system.cpu.ipc                               0.202856                       # IPC: instructions per cycle
+system.cpu.numCycles                            79056                       # number of cpu cycles simulated
+```
+
+TimingSimpleCPU
+
+```ruby
+./build/ARM/gem5.opt -d results/TimingSimpleCPU_mem_DDR3_2133_8x8 configs/example/se.py --cpu-type=TimingSimpleCPU  --mem-type=DDR3_2133_8x8 --caches -c ./script/programCompiled
+```
+
+
+```ruby
+final_tick                                   49715000                       # Number of ticks from beginning of simulation (restored from checkpoints and never reset)
+host_inst_rate                                 364095                       # Simulator instruction rate (inst/s)
+host_mem_usage                                 665336                       # Number of bytes of host memory used
+host_op_rate                                   423381                       # Simulator op (including micro ops) rate (op/s)
+host_seconds                                     0.04                       # Real time elapsed on the host
+host_tick_rate                             1132070385                       # Simulator tick rate (ticks/s)
+sim_freq                                 1000000000000                       # Frequency of simulated ticks
+sim_insts                                       15938                       # Number of instructions simulated
+sim_ops                                         18583                       # Number of ops (including micro ops) simulated
+sim_seconds                                  0.000050                       # Number of seconds simulated
+sim_ticks                                    49715000                       # Number of ticks simulated
+system.cpu.Branches                              3258                       # Number of branches fetched
+system.cpu.committedInsts                       15938                       # Number of instructions committed
+system.cpu.committedOps                         18583                       # Number of ops (including micro ops) committed
+system.cpu.idle_fraction                     0.000000                       # Percentage of idle cycles
+system.cpu.not_idle_fraction                 1.000000                       # Percentage of non-idle cycles
+system.cpu.numCycles                            99430                       # number of cpu cycles simulated
+
+```
+Παρατηρώ ότι μειώθηκαν οι χρόνοι εκτέλεσης από την αρχική μας περίπτωση. Αυτό είναι λογικό αφού αρχικά είχαμε DDR3_1600_8x8 : (1.6 x 8 x 8 / 8 = 12.8 GBps) και τώρα DDR3_2133_8x8 : (2.133 x 8 x 8 / 8 = 17.0 GBps).
