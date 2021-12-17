@@ -181,8 +181,8 @@ clk_domain=system.cpu_clk_domain
 <img src="Graphs/SPECMCF.png" width="400">
 
 
+<img src="Graphs/SPECSJENG .png" width="400">
 
-<img src="Graphs/SPECSJENG.png" width="400">
 
 
 Όπως είναι λογικό, η μείωση της συχνότητας του ρολογιού έχει ως αποτέλεσμα την αύξηση του χρόνου εκτέλεσης.
