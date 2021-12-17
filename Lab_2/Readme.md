@@ -22,7 +22,7 @@ system.cpu.dcache.replacements                 681759                       # nu
 system.l2.demand_accesses::total               683562                       # number of demand (read+write) accesses
 ```
 
-####Ερώτημα 2
+#### Ερώτημα 2
 Στο ερώτημα αυτό θα καταγράψουμε κάποια από τα βασικά αποτελέσματα των διαφορετικών benchmarks. Πιο συγκεκριμένα θα καταγράψουμε τον χρόνο εκτέλεσης, τα CPI καθώς και τα miss rates, τα οποία είναι και οι πιο σημαντικές μετρικές αξιολόγησης της απόδοσης ενός συστήματος.
 Παρακάτω βλέπουμε τα αποτελέσματα stats.txt του εκάστοτε benchmark.
 **SPECMCF**
@@ -177,7 +177,9 @@ clk_domain=system.cpu_clk_domain
 <img src="Graphs/SPECLIBM.png" width="400">
 
 
+
 <img src="Graphs/SPECMCF.png" width="400">
+
 
 
 <img src="Graphs/SPECSJENG.png" width="400">
