@@ -170,7 +170,7 @@ clk_domain=system.cpu_clk_domain
 
 
 
-<img src="Graphs/SPECBZIG.png" width="400">
+<img src="Graphs/SPECBZIP.png" width="400">
 
 
 
