@@ -1,6 +1,6 @@
 # Computer Architecture Lab 2
 
-##Ομάδα 13
+## Ομάδα 13
 ### Νένος Δημήτρης 9012 dimineno@ece.auth.gr
 ### Κουτζιαμπάσης Δημήτρης 8989 dkoutzia@ece.auth.gr
 
