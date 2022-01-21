@@ -1,0 +1,1 @@
+Reading simulation time from: mcpat/mcpat/mcpat_results/specmcf_12.txt
