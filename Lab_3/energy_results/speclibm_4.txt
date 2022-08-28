@@ -1,0 +1,4 @@
+Reading simulation time from: mcpat/mcpat/mcpat_results/speclibm_4.txt
+Reading simulation time from: Lab_2/spec_results/speclibm_4/stats.txt
+leakage: 2.113830 W, dynamic: 0.243480 W and runtime: 0.205597 sec
+energy is 484.655864 mJ

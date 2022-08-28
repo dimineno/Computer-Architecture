@@ -1,0 +1,4 @@
+Reading simulation time from: mcpat/mcpat/mcpat_results/spechmmer_11.txt
+Reading simulation time from: Lab_2/spec_results/spechmmer_11/stats.txt
+leakage: 8.692300 W, dynamic: 1.871120 W and runtime: 0.000047 sec
+energy is 0.496481 mJ
